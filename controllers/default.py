@@ -326,8 +326,8 @@ def eventView():
         if event.typeOfEvent == 'Urgent':
             temp["class"] = "event-important"
         temp["url"] = URL('showDes.html', args=[event.id])
-        temp["start"] = (event["startAt"] - datetime.datetime(1970, 1, 1)).total_seconds() * 1000
-        temp["end"] = (event.endAt - datetime.datetime(1970, 1, 1)).total_seconds() * 1000
+        temp["start"] = (event["startAt"] - datetime.datetime(1970, 1, 1)).total_seconds() * 1000 - 19800 * 1000
+        temp["end"] = (event.endAt - datetime.datetime(1970, 1, 1)).total_seconds() * 1000 - 19800 * 1000
         res.append(temp)
 
     return dict(success=1, result=res)
