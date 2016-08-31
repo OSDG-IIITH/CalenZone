@@ -3,7 +3,7 @@
 <link rel="stylesheet" href="{{=URL('static','DataTables/datatables.min.css')}}">
 <h1>Query Calendar</h1>
 <table id="datatable" border="1">
-    <thead><tr><th>id</th><th>Name</th><th>Begins</th><th>Ends</th><th>Venue</th><th>Contact</th><th>Description</th><th>Link</th><th>Type</th></tr></thead>
+    <thead><tr><th>id</th><th>Name</th><th>Begins</th><th>Ends</th><th>Venue</th><th>Contact</th><th>Description</th><th>Link</th><th>Type</th><th>My event?</th></tr></thead>
 {{for item in res:}}
 <tr>
     <td>{{=item.id}}</td>
@@ -15,6 +15,7 @@
     <td>{{=item.description}}</td>
     <td>{{=item.link}}</td>
     <td>{{=item.typeOfEvent}}</td>
+    <td>{{=item.created_by}}</td>
 </tr>
 {{pass}}
 </table>
