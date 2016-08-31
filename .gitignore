@@ -1,6 +1,5 @@
 errors/
 sessions/
-databases/
 .idea/
 # Windows image file caches
 Thumbs.db
