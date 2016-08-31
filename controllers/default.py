@@ -68,10 +68,16 @@ def profile():
     temp = db(db.userTag.auth_user == session.auth.user.id).select()
     mytags = []
     mytags += [(db.tag[i.tag].tagName, i.id) for i in temp]
+    mtags = []
+    mtags += [db.tag[i.tag].id for i in temp]
     form.vars.auth_user = session.auth.user.id
     grid = SQLFORM.grid(db.events.created_by == session.auth.user.id)
     if form.process().accepted:
-        response.flash = T("Tag Added!")
+        if form.vars.tag in mtags:
+            session.flash = T("Tag already added!")
+            db(db.userTag.id == form.vars.id).delete()
+        else:
+            session.flash = T("Tag Added!")
         redirect(URL())
     return locals()
 
