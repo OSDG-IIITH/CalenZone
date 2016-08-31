@@ -10,6 +10,7 @@
 <h1>Create an event</h1>
 <div class="container">
     {{=form.custom.begin}}
+    <div class="row">
     <div class="col-md-6">
         <div class="form-group">
             <label for="name">Event Name *:</label>
@@ -81,8 +82,12 @@
             <label for="typeOfEvent">Event Type *:</label>
             {{=form.custom.widget.typeOfEvent}}
         </div>
+        <br>
+        {{=form.custom.submit}}
     </div>
-    {{=form.custom.submit}}
+    </div>
+</div>
+    
     {{=form.custom.end}}
 </div>
 <script type="text/javascript">
