@@ -143,15 +143,23 @@ def createEvent():
     ##auto setting end date
     if request.post_vars.startAt:
         if request.post_vars.endAt == "":
-            form.vars.endAt = datetime.datetime.strptime(request.vars.startAt,
+            try:
+                form.vars.endAt = datetime.datetime.strptime(request.vars.startAt,
                                                          '%Y-%m-%d %H:%M:%S') + datetime.timedelta(0, 3600)
-            request.post_vars.endAt = str(
-                datetime.datetime.strptime(request.vars.startAt, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(0, 3600))
-        ##if request.vars["startAt"]
-        elif datetime.datetime.strptime(request.vars.startAt, '%Y-%m-%d %H:%M:%S') > datetime.datetime.strptime(
-                request.vars.endAt, '%Y-%m-%d %H:%M:%S'):
-            form.errors = True
-            response.flash += "End before start!"
+                request.post_vars.endAt = str(datetime.datetime.strptime(request.vars.startAt, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(0, 3600))
+            except:
+                response.flash += "Invalid Date Format: Start At"
+                form.errors = True
+                ##if request.vars["startAt"]
+        else:
+            try:   
+                datetime.datetime.strptime(request.vars.startAt, '%Y-%m-%d %H:%M:%S') > datetime.datetime.strptime(
+                request.vars.endAt, '%Y-%m-%d %H:%M:%S')
+                form.errors = True
+                response.flash += "End before start!"
+            except:
+                response.flash += "Invalid Date Format: End At"
+                form.errors = True
 
     ##Checking if groups are in db
 
