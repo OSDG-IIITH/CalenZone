@@ -9,8 +9,8 @@
 <script type="text/javascript" src="{{=URL('static','bower_components/moment/moment.js')}}"></script>
 <h1>Create an event</h1>
 <div class="container">
+    {{=form.custom.begin}}
     <div class="col-md-6">
-        {{=form.custom.begin}}
         <div class="form-group">
             <label for="name">Event Name *:</label>
             {{=form.custom.widget.eventName}}
