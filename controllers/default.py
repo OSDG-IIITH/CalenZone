@@ -115,6 +115,10 @@ def importEvents():
     return dict()
 
 @auth.requires_login()
+def checkMail():
+    generate_reminder()
+
+@auth.requires_login()
 def deleteGroup():
     try:
         group = request.args[0]
