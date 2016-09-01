@@ -218,17 +218,28 @@ def changeTags():
     ##adding group names
     x = db(db.tag).select(db.tag.tagName)
     y = groupNameFormatter(x)
+    print y
     q1 = db.eventTag.events == form_id
     q2 = db.tag.id == db.eventTag.tag
     currentTags = groupNameFormatter(db(q1 & q2).select(db.tag.tagName))
     if request.vars.groups:
-        db(db.eventTag.events == form_id).delete()
         groups = request.vars.groups.split(", ")
         for group in groups:
-            gr_id = db(db.tag.tagName == group).select(db.tag.id)[0].id
-            db.eventTag.insert(tag=gr_id, events=form_id)
+            try:
+                gr_id = db(db.tag.tagName == group).select(db.tag.id)[0].id
+            except IndexError:
+                response.flash = 'Group ' + group + ' does not exist!'
+                return dict(grouplist=(y), currentTags=currentTags)
+        db(db.eventTag.events == form_id).delete()
+        for group in groups:
+            try:
+                gr_id = db(db.tag.tagName == group).select(db.tag.id)[0].id
+                db.eventTag.insert(tag=gr_id, events=form_id)
+            except IndexError:
+                response.flash = 'Group ' + group + ' does not exist!'
+                return dict(grouplist=(y), currentTags=currentTags)
         redirect(URL('myEvents'))
-    return dict(grouplist=T(y), currentTags=currentTags)
+    return dict(grouplist=(y), currentTags=currentTags)
 
 
 @auth.requires_login()
