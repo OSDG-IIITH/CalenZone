@@ -11,6 +11,7 @@ import time
 import datetime
 import csv
 
+UNREMOVABLE_GROUPS = ["All", "Students", "Reasearch", "Faculty"]
 
 def index():
     """
@@ -116,12 +117,23 @@ def importEvents():
 @auth.requires_login()
 def deleteGroup():
     try:
-        gid = request.args[0]
+        group = request.args[0]
     except IndexError:
+        session.flash = "Incorrect Url: No parameters"
         redirect(URL('profile'))
-    ownerOfTag = db(db.userTag.id == gid).select()[0].auth_user
-    if ownerOfTag == session.auth.user.id:
-        crud.delete(db.userTag, gid)
+    if group in UNREMOVABLE_GROUPS:
+        session.flash = "You cannot remove yourself from this group!"
+        redirect(URL('profile'))
+    group = db(db.tag.tagName == group)
+    if group.count() == 0:
+        session.flash = "Non existant group!"
+        redirect(URL('profile'))
+    tag_id = group.select()[0].id
+    userTagRow = db((db.userTag.tag == tag_id) & (db.userTag.auth_user == session.auth.user))
+    if userTagRow.count() == 0:
+        session.flash = "You are already not in this group!"
+    else:
+        crud.delete(db.userTag, userTagRow.select()[0].id)
     redirect(URL('profile'))
     return
 
