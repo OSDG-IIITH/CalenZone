@@ -1,9 +1,9 @@
 {{extend 'layout.html'}}
 <h2>My Events</h2>
 <table class="table table-striped" border="1">
-    <thead><tr><th>Name</th><th>Begins</th><th>Ends</th><th>Type</th></tr></thead>
+    <thead><tr><th>Name</th><th>Begins</th><th>Ends</th><th>Type</th><th>Tags</th></tr></thead>
     <tbody>
-{{for item in events:}}
+{{for idx, item in enumerate(events):}}
 <tr>
     <td>{{=item.eventName}}
         <a role="button" class="btn btn-xs btn-danger" style = "float: right;" href='{{=URL("deleteEvent", args=[item.id])}}'>
@@ -14,11 +14,15 @@
     <td>{{=item.startAt.strftime("%H:%M %B %d, %Y")}}</td>
     <td>{{=item.endAt.strftime("%H:%M %B %d, %Y")}}</td>
     <td>{{=item.typeOfEvent}} </td>
+    <td>{{=tagarr[idx]}}
+    <a role="button" class="btn btn-xs btn-primary" style = "float: right;" href='{{=URL("changeTags", args=[item.id])}}'>
+         <span class="  glyphicon glyphicon-pencil"></span>&nbsp;</a>
+         </td>
 </tr>
 {{pass}}
         </tbody>
 </table>
-<!--<table class="table table-striped" border="1">
+<!-- <table class="table table-striped" border="1">
 <tbody>
 <tr>
     <th>Event</th>
@@ -37,4 +41,5 @@ No events
 </tr>
 {{pass}}
 </tbody>
-</table>-->
+</table>
+ -->
