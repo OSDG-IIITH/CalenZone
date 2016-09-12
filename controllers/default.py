@@ -240,6 +240,7 @@ def changeTags():
     if request.vars.groups:
         db(db.eventTag.events == form_id).delete()
         groups = request.vars.groups.split(", ")
+        groups = list(set(groups))
         for group in groups:
             try:
                 gr_id = db(db.tag.tagName == group).select(db.tag.id)[0].id
