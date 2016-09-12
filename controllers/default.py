@@ -155,14 +155,10 @@ def deleteGroup():
     return
 
 
-def groupNameFormatter(x):
-    y = ""
-    for i in x:
-        y = y + "\'" + str(i.tagName) + "\'"
-        y = y + ","
-    if y != "":
-        y = y[:-1]
-    return y
+def groupNameFormatter(list_of_tags):
+    "Function to turn list of tags into commas separated values"
+    new_list = ["\'%s\'" % (str(i.tagName)) for i in list_of_tags]
+    return ",".join(new_list)
 
 
 @auth.requires_login()
