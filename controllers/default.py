@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-# this file is released under public domain and you can use without limitations
 
 #########################################################################
-## This is a sample controller
 ## - index is the default action of any application
 ## - user is required for authentication and authorization
 ## - download is for downloading files uploaded in the db (does streaming)
 #########################################################################
+
 import time
 import datetime
 import csv
@@ -27,12 +26,11 @@ def index():
 
 @auth.requires_login()
 def search():
-    key=None
-    q1 = db.userTag.tag == db.eventTag.tag
-    q1 &= (db.userTag.auth_user == session.auth.user.id)
-    q1 &= (db.events.id == db.eventTag.events)
-    res = db(q1).select(db.events.ALL)
-    return dict(res=res, key=key)
+    query = db.userTag.tag == db.eventTag.tag
+    query &= (db.userTag.auth_user == session.auth.user.id)
+    query &= (db.events.id == db.eventTag.events)
+    res = db(query).select(db.events.ALL)
+    return dict(res=res)
 
 def iCal():
     useremail = request.args[0]
@@ -114,8 +112,8 @@ def importEvents():
 
     return dict()
 
-@auth.requires_login()
 def checkMail():
+    "Place holder function to test scheduler. To be removed in deployment."
     generate_reminder()
 
 @auth.requires_login()

@@ -8,10 +8,10 @@ mail.settings.sender = ''
 mail.settings.login  = ':'
 
 mailing_list = {
-    "All" : ""
-    "Students" : "students@lists.iiit.ac.in"
-    "Research" : "research@lists.iiit.ac.in"
-    "Faculty" : "faculty@lists.iiit.ac.in"
+    "All" : "",
+    "Students" : "students@lists.iiit.ac.in",
+    "Research" : "research@lists.iiit.ac.in",
+    "Faculty" : "faculty@lists.iiit.ac.in",
 }
 
 reminder_Template = "<INSERT MAIL TEMPLATE HERE>"
