@@ -234,23 +234,13 @@ def changeTags():
     for i in z:
         currentTags=currentTags+i.tagName + ","
     if request.vars.groups:
+        db(db.eventTag.events == form_id).delete()
         groups = request.vars.groups.split(", ")
         for group in groups:
-            try:
-                gr_id = db(db.tag.tagName == group).select(db.tag.id)[0].id
-            except IndexError:
-                response.flash = 'Group ' + group + ' does not exist!'
-                return dict(grouplist=(y), currentTags=currentTags)
-        db(db.eventTag.events == form_id).delete()
-        for group in groups:
-            try:
-                gr_id = db(db.tag.tagName == group).select(db.tag.id)[0].id
-                db.eventTag.insert(tag=gr_id, events=form_id)
-            except IndexError:
-                response.flash = 'Group ' + group + ' does not exist!'
-                return dict(grouplist=(y), currentTags=currentTags)
+            gr_id = db(db.tag.tagName == group).select(db.tag.id)[0].id
+            db.eventTag.insert(tag=gr_id, events=form_id)
         redirect(URL('myEvents'))
-    return dict(grouplist=(y), currentTags=currentTags)
+    return dict(grouplist=T(y), currentTags=currentTags)
 
 
 @auth.requires_login()
