@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-# this file is released under public domain and you can use without limitations
 
 #########################################################################
-## This is a sample controller
 ## - index is the default action of any application
 ## - user is required for authentication and authorization
 ## - download is for downloading files uploaded in the db (does streaming)
 #########################################################################
+
 import time
 import datetime
 import csv
@@ -25,14 +24,15 @@ def index():
     redirect(URL('calendar'))
     return dict(title='Please Log in')
 
+
 @auth.requires_login()
 def search():
-    key=None
-    q1 = db.userTag.tag == db.eventTag.tag
-    q1 &= (db.userTag.auth_user == session.auth.user.id)
-    q1 &= (db.events.id == db.eventTag.events)
-    res = db(q1).select(db.events.ALL)
-    return dict(res=res, key=key)
+    query = db.userTag.tag == db.eventTag.tag
+    query &= (db.userTag.auth_user == session.auth.user.id)
+    query &= (db.events.id == db.eventTag.events)
+    res = db(query).select(db.events.ALL)
+    return dict(res=res)
+
 
 def iCal():
     useremail = request.args[0]
@@ -61,6 +61,7 @@ def iCal():
     s += '\nEND:VCALENDAR'
     return s
 
+
 @auth.requires_login()
 def profile():
     form = SQLFORM(db.userTag)
@@ -82,6 +83,7 @@ def profile():
             session.flash = T("Tag Added!")
         redirect(URL())
     return locals()
+
 
 @auth.requires_login()
 def importEvents():
@@ -114,6 +116,12 @@ def importEvents():
                     }))
 
     return dict()
+
+
+def checkMail():
+    "Place holder function to test scheduler. To be removed in deployment."
+    generate_reminder()
+
 
 @auth.requires_login()
 def deleteGroup():
@@ -171,7 +179,7 @@ def createEvent():
                 form.errors = True
                 ##if request.vars["startAt"]
         else:
-            try:   
+            try:
                 datetime.datetime.strptime(request.vars.startAt, '%Y-%m-%d %H:%M:%S') > datetime.datetime.strptime(
                 request.vars.endAt, '%Y-%m-%d %H:%M:%S')
                 form.errors = True
@@ -217,6 +225,7 @@ def changeTags():
     ##adding group names
     x = db(db.tag).select(db.tag.tagName)
     y = groupNameFormatter(x)
+    print y
     q1 = db.eventTag.events == form_id
     q2 = db.tag.id == db.eventTag.tag
     # currentTags = groupNameFormatter(db(q1 & q2).select(db.tag.tagName))
@@ -225,13 +234,23 @@ def changeTags():
     for i in z:
         currentTags=currentTags+i.tagName + ","
     if request.vars.groups:
-        db(db.eventTag.events == form_id).delete()
         groups = request.vars.groups.split(", ")
         for group in groups:
-            gr_id = db(db.tag.tagName == group).select(db.tag.id)[0].id
-            db.eventTag.insert(tag=gr_id, events=form_id)
+            try:
+                gr_id = db(db.tag.tagName == group).select(db.tag.id)[0].id
+            except IndexError:
+                response.flash = 'Group ' + group + ' does not exist!'
+                return dict(grouplist=(y), currentTags=currentTags)
+        db(db.eventTag.events == form_id).delete()
+        for group in groups:
+            try:
+                gr_id = db(db.tag.tagName == group).select(db.tag.id)[0].id
+                db.eventTag.insert(tag=gr_id, events=form_id)
+            except IndexError:
+                response.flash = 'Group ' + group + ' does not exist!'
+                return dict(grouplist=(y), currentTags=currentTags)
         redirect(URL('myEvents'))
-    return dict(grouplist=T(y), currentTags=currentTags)
+    return dict(grouplist=(y), currentTags=currentTags)
 
 
 @auth.requires_login()
@@ -291,9 +310,11 @@ def editEvent():
         redirect(URL('myEvents'))
     return dict(form=form)
 
+
 def gen_mail():
     response.view = 'default/index.html'
     return locals()
+
 
 def calendar():
     if session.auth != None:
