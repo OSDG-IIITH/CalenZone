@@ -10,7 +10,7 @@ import time
 import datetime
 import csv
 
-UNREMOVABLE_GROUPS = ["All", "Students", "Reasearch", "Faculty"]
+UNREMOVABLE_GROUPS = ["All", "Students", "Research", "Faculty"]
 
 def index():
     """
@@ -37,12 +37,12 @@ def search():
 def iCal():
     useremail = request.args[0]
     userid = db(db.auth_user.email==useremail).select(db.auth_user.id)[0]
-    
+
     q1 = db.userTag.tag == db.eventTag.tag
     q2 = db.userTag.auth_user == userid
     q3 = db.events.id == db.eventTag.events
     events = db((q1 & q2 & q3)).select(db.events.ALL,distinct=True)
-    
+
     title = "IIIT CALENDAR"
     exported_data = \
     """BEGIN:VCALENDAR
