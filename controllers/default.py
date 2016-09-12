@@ -24,6 +24,7 @@ def index():
     redirect(URL('calendar'))
     return dict(title='Please Log in')
 
+
 @auth.requires_login()
 def search():
     query = db.userTag.tag == db.eventTag.tag
@@ -31,6 +32,7 @@ def search():
     query &= (db.events.id == db.eventTag.events)
     res = db(query).select(db.events.ALL)
     return dict(res=res)
+
 
 def iCal():
     useremail = request.args[0]
@@ -59,6 +61,7 @@ def iCal():
     s += '\nEND:VCALENDAR'
     return s
 
+
 @auth.requires_login()
 def profile():
     form = SQLFORM(db.userTag)
@@ -79,6 +82,7 @@ def profile():
             session.flash = T("Tag Added!")
         redirect(URL())
     return locals()
+
 
 @auth.requires_login()
 def importEvents():
@@ -112,9 +116,11 @@ def importEvents():
 
     return dict()
 
+
 def checkMail():
     "Place holder function to test scheduler. To be removed in deployment."
     generate_reminder()
+
 
 @auth.requires_login()
 def deleteGroup():
@@ -172,7 +178,7 @@ def createEvent():
                 form.errors = True
                 ##if request.vars["startAt"]
         else:
-            try:   
+            try:
                 datetime.datetime.strptime(request.vars.startAt, '%Y-%m-%d %H:%M:%S') > datetime.datetime.strptime(
                 request.vars.endAt, '%Y-%m-%d %H:%M:%S')
                 form.errors = True
@@ -299,9 +305,11 @@ def editEvent():
         redirect(URL('myEvents'))
     return dict(form=form)
 
+
 def gen_mail():
     response.view = 'default/index.html'
     return locals()
+
 
 def calendar():
     if session.auth != None:
