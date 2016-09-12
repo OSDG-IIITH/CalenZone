@@ -24,6 +24,7 @@ def index():
     redirect(URL('calendar'))
     return dict(title='Please Log in')
 
+
 @auth.requires_login()
 def search():
     query = db.userTag.tag == db.eventTag.tag
@@ -31,6 +32,7 @@ def search():
     query &= (db.events.id == db.eventTag.events)
     res = db(query).select(db.events.ALL)
     return dict(res=res)
+
 
 def iCal():
     useremail = request.args[0]
@@ -67,19 +69,21 @@ def iCal():
     exported_data += "END:VCALENDAR"
     return exported_data
 
+
 @auth.requires_login()
 def profile():
     form = SQLFORM(db.userTag)
-    # dn=db(db.auth_user.id==request.args[0]).select()
-    # tags = db(db.auth_user.id==db.userTag.auth_user and db.tag.id==db.userTag.tag).select(db.auth_user.email, db.tag.tagName)
+    # Get tag names for display in view
     temp = db(db.userTag.auth_user == session.auth.user.id).select()
     mytags = []
     mytags += [(db.tag[i.tag].tagName, i.id) for i in temp]
+    # Get tag ids to check for duplicates
     mtags = []
     mtags += [db.tag[i.tag].id for i in temp]
     form.vars.auth_user = session.auth.user.id
     grid = SQLFORM.grid(db.events.created_by == session.auth.user.id)
     if form.process().accepted:
+        # If the tag already exits, delete the new duplicate entry
         if form.vars.tag in mtags:
             session.flash = T("Tag already added!")
             db(db.userTag.id == form.vars.id).delete()
@@ -87,6 +91,7 @@ def profile():
             session.flash = T("Tag Added!")
         redirect(URL())
     return locals()
+
 
 @auth.requires_login()
 def importEvents():
@@ -120,9 +125,11 @@ def importEvents():
 
     return dict()
 
+
 def checkMail():
     "Place holder function to test scheduler. To be removed in deployment."
     generate_reminder()
+
 
 @auth.requires_login()
 def deleteGroup():
@@ -180,7 +187,7 @@ def createEvent():
                 form.errors = True
                 ##if request.vars["startAt"]
         else:
-            try:   
+            try:
                 datetime.datetime.strptime(request.vars.startAt, '%Y-%m-%d %H:%M:%S') > datetime.datetime.strptime(
                 request.vars.endAt, '%Y-%m-%d %H:%M:%S')
                 form.errors = True
@@ -228,7 +235,11 @@ def changeTags():
     y = groupNameFormatter(x)
     q1 = db.eventTag.events == form_id
     q2 = db.tag.id == db.eventTag.tag
-    currentTags = groupNameFormatter(db(q1 & q2).select(db.tag.tagName))
+    # currentTags = groupNameFormatter(db(q1 & q2).select(db.tag.tagName))
+    z = db(q1 & q2).select(db.tag.tagName)
+    currentTags = ""
+    for i in z:
+        currentTags=currentTags+i.tagName + ","
     if request.vars.groups:
         db(db.eventTag.events == form_id).delete()
         groups = request.vars.groups.split(", ")
@@ -296,9 +307,11 @@ def editEvent():
         redirect(URL('myEvents'))
     return dict(form=form)
 
+
 def gen_mail():
     response.view = 'default/index.html'
     return locals()
+
 
 def calendar():
     if session.auth != None:
