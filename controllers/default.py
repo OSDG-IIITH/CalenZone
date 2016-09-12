@@ -232,12 +232,17 @@ def changeTags():
     z = db(q1 & q2).select(db.tag.tagName)
     currentTags = ""
     for i in z:
-        currentTags=currentTags+i.tagName + ","
+        currentTags=currentTags+i.tagName + ", "
+    currentTags = currentTags[:-2]
     if request.vars.groups:
         db(db.eventTag.events == form_id).delete()
         groups = request.vars.groups.split(", ")
         for group in groups:
-            gr_id = db(db.tag.tagName == group).select(db.tag.id)[0].id
+            try:
+                gr_id = db(db.tag.tagName == group).select(db.tag.id)[0].id
+            except IndexError:
+                session.flash = 'Group ' + group + ' does not exist!'
+                redirect(URL('changeTags', args=[form_id]))
             db.eventTag.insert(tag=gr_id, events=form_id)
         redirect(URL('myEvents'))
     return dict(grouplist=T(y), currentTags=currentTags)
