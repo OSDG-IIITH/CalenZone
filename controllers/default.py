@@ -175,8 +175,7 @@ def createEvent():
     if request.post_vars.startAt:
         if request.post_vars.endAt == "":
             try:
-                form.vars.endAt = datetime.datetime.strptime(request.vars.startAt,
-                                                         '%Y-%m-%d %H:%M:%S') + datetime.timedelta(0, 3600)
+                #form.vars.endAt = datetime.datetime.strptime(request.vars.startAt,'%Y-%m-%d %H:%M:%S') + datetime.timedelta(0, 3600)
                 request.post_vars.endAt = str(datetime.datetime.strptime(request.vars.startAt, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(0, 3600))
             except:
                 response.flash += "Invalid Date Format: Start At"
@@ -191,6 +190,11 @@ def createEvent():
             except:
                 response.flash += "Invalid Date Format: End At"
                 form.errors = True
+
+    if request.post_vars.dayevent:
+        tim = datetime.datetime.strptime(request.vars.startAt,'%Y-%m-%d %H:%M:%S').replace(hour=00,minute=00,second=0)
+        request.post_vars.startAt = str(tim)
+        request.post_vars.endAt = str(tim.replace(hour=23, minute=59, second=59))
 
     ##Checking if groups are in db
 
@@ -208,7 +212,7 @@ def createEvent():
 
     if not form.errors:
         if form.process().accepted:
-            response.flash = "Event created successfully"
+            session.flash = "Event created successfully"
             groups = request.vars.groups.split(", ")
             for group in groups:
                 gr_id = db(db.tag.tagName == group).select(db.tag.id)[0].id
