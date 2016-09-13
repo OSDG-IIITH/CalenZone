@@ -12,24 +12,21 @@ import csv
 
 UNREMOVABLE_GROUPS = ["All", "Students", "Research", "Faculty"]
 
+
 def index():
     """
-    example action using the internationalization operator T and flash
-    rendered by views/default/index.html or views/generic.html
-
-    if you need a simple wiki simply replace the two lines below with:
-    return auth.wiki()
+    Dummy to redirect to home page
     """
     response.flash = T("Welcome to IIIT Calendar Portal")
     redirect(URL('calendar'))
-    return dict(title='Please Log in')
+    return None # Should never reach here because of redirect
 
 
 @auth.requires_login()
 def search():
-    query = db.userTag.tag == db.eventTag.tag
-    query &= (db.userTag.auth_user == session.auth.user.id)
-    query &= (db.events.id == db.eventTag.events)
+    query = db.userTag.tag == db.eventTag.tag # Join userTag and eventTag
+    query &= (db.userTag.auth_user == session.auth.user.id) # Check if logged in user is subscribed to some tag
+    query &= (db.events.id == db.eventTag.events) # Join eventTag and events
     res = db(query).select(db.events.ALL)
     return dict(res=res)
 
@@ -95,44 +92,42 @@ def profile():
 
 @auth.requires_login()
 def importEvents():
-    groups = db(db.tag.id>0).select()
-    grp_dict = {}
-    for a in groups:
-        grp_dict[a.tagName]=a.id
+    all_tags = db(db.tag.id>0).select() # Gets all rows in the table tag
+    group_dict = {a.tagName:a.id for i in all_tags}
 
     if request.vars.csvfile != None:
-        file = request.vars.csvfile.file
-        csvdata = csv.reader(file)
-        for arr in csvdata:
+        csvdata = csv.reader(request.vars.csvfile.file)
+        for entry in csvdata:
             id = db.events.insert(**db.events._filter_fields({
-                "eventName":arr[0],
-                "startAt":arr[1],
-                "endAt":arr[2],
-                "venue":arr[3],
-                "contact":arr[4],
-                "description":arr[5],
-                "link":arr[6],
-                "typeOfEvent":arr[7],
+                "eventName":entry[0],
+                "startAt":entry[1],
+                "endAt":entry[2],
+                "venue":entry[3],
+                "contact":entry[4],
+                "description":entry[5],
+                "link":entry[6],
+                "typeOfEvent":entry[7],
                 "created_by":session.auth.user.id,
                 "created_at":datetime.datetime.utcnow()
                 }))
-            grps = arr[8].split(";")
-            for grp in grps:
+            groups = entry[8].split(";")
+            for group in groups:
                 db.eventTag.insert(**db.eventTag._filter_fields({
-                    "tag":grp_dict[grp.strip()],
+                    "tag":group_dict[group.strip()],
                     "events":id
                     }))
 
     return dict()
 
 
-def checkMail():
+def TEST_MAIL_FUNC():
     "Place holder function to test scheduler. To be removed in deployment."
     generate_reminder()
 
 
 @auth.requires_login()
 def deleteGroup():
+    "Function to remove the some user from a group"
     try:
         group = request.args[0]
     except IndexError:
@@ -152,7 +147,7 @@ def deleteGroup():
     else:
         crud.delete(db.userTag, userTagRow.select()[0].id)
     redirect(URL('profile'))
-    return
+    return None
 
 
 def groupNameFormatter(list_of_tags):
@@ -166,31 +161,33 @@ def createEvent():
     form = SQLFORM(db.events)
     form.vars.created_by = session.auth.user.id
 
-    ##adding group names
+    # Adding group names
     x = db(db.tag).select(db.tag.tagName)
     y = groupNameFormatter(x)
 
-    ##Processing Form
-    ##auto setting end date
+    # Processing Form
+    # Auto setting end date
     if request.post_vars.startAt:
         if request.post_vars.endAt == "":
             try:
-                form.vars.endAt = datetime.datetime.strptime(request.vars.startAt,
-                                                         '%Y-%m-%d %H:%M:%S') + datetime.timedelta(0, 3600)
+                #form.vars.endAt = datetime.datetime.strptime(request.vars.startAt,'%Y-%m-%d %H:%M:%S') + datetime.timedelta(0, 3600)
                 request.post_vars.endAt = str(datetime.datetime.strptime(request.vars.startAt, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(0, 3600))
             except:
                 response.flash += "Invalid Date Format: Start At"
                 form.errors = True
-                ##if request.vars["startAt"]
         else:
             try:
-                datetime.datetime.strptime(request.vars.startAt, '%Y-%m-%d %H:%M:%S') > datetime.datetime.strptime(
-                request.vars.endAt, '%Y-%m-%d %H:%M:%S')
+                datetime.datetime.strptime(request.vars.startAt, '%Y-%m-%d %H:%M:%S') > datetime.datetime.strptime(request.vars.endAt, '%Y-%m-%d %H:%M:%S')
                 form.errors = True
                 response.flash += "End before start!"
             except:
                 response.flash += "Invalid Date Format: End At"
                 form.errors = True
+
+    if request.post_vars.dayevent:
+        tim = datetime.datetime.strptime(request.vars.startAt,'%Y-%m-%d %H:%M:%S').replace(hour=00,minute=00,second=0)
+        request.post_vars.startAt = str(tim)
+        request.post_vars.endAt = str(tim.replace(hour=23, minute=59, second=59))
 
     ##Checking if groups are in db
 
@@ -208,7 +205,7 @@ def createEvent():
 
     if not form.errors:
         if form.process().accepted:
-            response.flash = "Event created successfully"
+            session.flash = "Event created successfully"
             groups = request.vars.groups.split(", ")
             for group in groups:
                 gr_id = db(db.tag.tagName == group).select(db.tag.id)[0].id
@@ -223,20 +220,19 @@ def changeTags():
     try:
         request.args[0]
     except IndexError:
+        session.flash = "Non existant event"
         redirect(URL('myEvents'))
     form_id = request.args[0]
 
-    ##adding group names
+    # Adding group names
     x = db(db.tag).select(db.tag.tagName)
     y = groupNameFormatter(x)
-    q1 = db.eventTag.events == form_id
-    q2 = db.tag.id == db.eventTag.tag
-    # currentTags = groupNameFormatter(db(q1 & q2).select(db.tag.tagName))
-    z = db(q1 & q2).select(db.tag.tagName)
-    currentTags = ""
-    for i in z:
-        currentTags=currentTags+i.tagName + ", "
-    currentTags = currentTags[:-2]
+    query1 = db.eventTag.events == form_id
+    query2 = db.tag.id == db.eventTag.tag
+
+    list_of_tags = db(query1 & query2).select(db.tag.tagName)
+    list_of_tags = [i.tagName for i in list_of_tags]
+    currentTags = ", ".join(list_of_tags)
     if request.vars.groups:
         db(db.eventTag.events == form_id).delete()
         groups = request.vars.groups.split(", ")
@@ -257,17 +253,16 @@ def setEventTags():
     myevents = db(db.events.created_by == session.auth.user.id).select(db.events.id)
     temp = [i for i in myevents]
     form = SQLFORM.grid(db.eventTag.events.belongs(temp))
-    # if form.process().accepted:
-    #    response.flash = T("Tag added!")
     return locals()
 
 
 def showEvent():
     event = db(db.events.auth_user == request.args[0]).select()[0]
-    return locals();
+    return dict(event=event)
 
 
 def showDes():
+    "Function to show details of an event"
     des = db(db.events.id == request.args[0]).select(db.events.description, db.events.startAt, db.events.endAt,
                                                      db.events.link, db.events.contact, db.events.eventName,
                                                      db.events.venue)[0]
@@ -277,15 +272,14 @@ def showDes():
 @auth.requires_login()
 def myEvents():
     events = db(db.events.created_by == session.auth.user.id).select()
-    tagarr = []
+    tag_list = []
     for event in events:
-        q1 = db.eventTag.events == event.id
-        q2 = db.tag.id == db.eventTag.tag
-        currentTags = groupNameFormatter(db(q1 & q2).select(db.tag.tagName))
         #Add string of tags of current events to tagarr
-        tagarr.append(currentTags)
-        
-    return locals()
+        query1 = db.eventTag.events == event.id
+        query2 = db.tag.id == db.eventTag.tag
+        currentTags = groupNameFormatter(db(query1 & query2).select(db.tag.tagName))
+        tag_list.append(currentTags)
+    return dict(events=events, tag_list=tag_list)
 
 
 @auth.requires_login()
@@ -293,17 +287,18 @@ def editEvent():
     try:
         request.args[0]
     except IndexError:
+        session.flash = "No argument given!"
         redirect(URL('myEvents'))
-    eventId = request.args[0]
+    event_id = request.args[0]
     try:
-        created_by = db(db.events.id == eventId).select(db.events.created_by)[0].created_by
+        created_by = db(db.events.id == event_id).select(db.events.created_by)[0].created_by
     except IndexError:
+        session.flash = "No such event exists!"
         redirect(URL('myEvents'))
     if created_by != session.auth.user.id:
+        session.flash = "This is not your event!"
         redirect(URL('myEvents'))
-    # form1=crud.update(db.events,eventId)
-    # crud.settings.update_next = URL('myEvents')
-    record = db.events(eventId)
+    record = db.events(event_id)
     form = SQLFORM(db.events, record)
     if form.process().accepted:
         redirect(URL('myEvents'))
@@ -318,7 +313,7 @@ def gen_mail():
 def calendar():
     if session.auth != None:
         useremail = db(db.auth_user.id==session.auth.user.id).select(db.auth_user.email)[0].email
-        check = db((db.userTag.auth_user == session.auth.user.id) & (db.userTag.tag == db.tag.id) & (db.tag.tagName == "All")).count()
+        check = db((db.userTag.auth_user == session.auth.user.id) & (db.userTag.tag == db.tag.id) & (db.tag.tagName == "All")).count() # Code to add the All tag to every user that logs in
         if check == 0:
             db.userTag.insert(auth_user=session.auth.user.id, tag=1)
     else:
@@ -328,14 +323,18 @@ def calendar():
 
 @auth.requires_login()
 def deleteEvent():
-    event_id = request.args[0]
+    try:
+        event_id = request.args[0]
+    except IndexError:
+        session.flash = "No event id!"
+        redirect(URL('myEvents'))
     event = db.events[event_id]
     if event == None:
         session.flash = "Event does not exist!"
         redirect(URL('myEvents'))
     if event.created_by == session.auth.user.id:
-        session.flash = "Event deleted!"
         db(db.events.id == event_id).delete()
+        session.flash = "Event deleted!"
     else:
         session.flash = "You do no have permission to delete this event!"
     redirect(URL('myEvents'))
