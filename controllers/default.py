@@ -279,12 +279,12 @@ def myEvents():
     events = db(db.events.created_by == session.auth.user.id).select()
     tagarr = []
     for event in events:
-        x = db(db.tag).select(db.tag.tagName)
-        y = groupNameFormatter(x)
         q1 = db.eventTag.events == event.id
         q2 = db.tag.id == db.eventTag.tag
         currentTags = groupNameFormatter(db(q1 & q2).select(db.tag.tagName))
+        #Add string of tags of current events to tagarr
         tagarr.append(currentTags)
+        
     return locals()
 
 
