@@ -147,7 +147,7 @@ def deleteGroup():
     else:
         crud.delete(db.userTag, userTagRow.select()[0].id)
     redirect(URL('profile'))
-    return
+    return None
 
 
 def groupNameFormatter(list_of_tags):
@@ -161,12 +161,12 @@ def createEvent():
     form = SQLFORM(db.events)
     form.vars.created_by = session.auth.user.id
 
-    ##adding group names
+    # Adding group names
     x = db(db.tag).select(db.tag.tagName)
     y = groupNameFormatter(x)
 
-    ##Processing Form
-    ##auto setting end date
+    # Processing Form
+    # Auto setting end date
     if request.post_vars.startAt:
         if request.post_vars.endAt == "":
             try:
@@ -176,11 +176,9 @@ def createEvent():
             except:
                 response.flash += "Invalid Date Format: Start At"
                 form.errors = True
-                ##if request.vars["startAt"]
         else:
             try:
-                datetime.datetime.strptime(request.vars.startAt, '%Y-%m-%d %H:%M:%S') > datetime.datetime.strptime(
-                request.vars.endAt, '%Y-%m-%d %H:%M:%S')
+                datetime.datetime.strptime(request.vars.startAt, '%Y-%m-%d %H:%M:%S') > datetime.datetime.strptime(request.vars.endAt, '%Y-%m-%d %H:%M:%S')
                 form.errors = True
                 response.flash += "End before start!"
             except:
@@ -229,6 +227,7 @@ def changeTags():
     query2 = db.tag.id == db.eventTag.tag
 
     list_of_tags = db(query1 & query2).select(db.tag.tagName)
+    list_of_tags = [i.tagName for i in list_of_tags]
     currentTags = ", ".join(list_of_tags)
     if request.vars.groups:
         db(db.eventTag.events == form_id).delete()
@@ -250,8 +249,6 @@ def setEventTags():
     myevents = db(db.events.created_by == session.auth.user.id).select(db.events.id)
     temp = [i for i in myevents]
     form = SQLFORM.grid(db.eventTag.events.belongs(temp))
-    # if form.process().accepted:
-    #    response.flash = T("Tag added!")
     return locals()
 
 
@@ -271,15 +268,13 @@ def showDes():
 @auth.requires_login()
 def myEvents():
     events = db(db.events.created_by == session.auth.user.id).select()
-    tagarr = []
+    tag_list = []
     for event in events:
-        x = db(db.tag).select(db.tag.tagName)
-        y = groupNameFormatter(x)
-        q1 = db.eventTag.events == event.id
-        q2 = db.tag.id == db.eventTag.tag
-        currentTags = groupNameFormatter(db(q1 & q2).select(db.tag.tagName))
-        tagarr.append(currentTags)
-    return locals()
+        query1 = db.eventTag.events == event.id
+        query2 = db.tag.id == db.eventTag.tag
+        currentTags = groupNameFormatter(db(query1 & query2).select(db.tag.tagName))
+        tag_list.append(currentTags)
+    return dict(events=events, tag_list=tag_list)
 
 
 @auth.requires_login()
@@ -287,17 +282,18 @@ def editEvent():
     try:
         request.args[0]
     except IndexError:
+        session.flash = "No argument given!"
         redirect(URL('myEvents'))
-    eventId = request.args[0]
+    event_id = request.args[0]
     try:
-        created_by = db(db.events.id == eventId).select(db.events.created_by)[0].created_by
+        created_by = db(db.events.id == event_id).select(db.events.created_by)[0].created_by
     except IndexError:
+        session.flash = "No such event exists!"
         redirect(URL('myEvents'))
     if created_by != session.auth.user.id:
+        session.flash = "This is not your event!"
         redirect(URL('myEvents'))
-    # form1=crud.update(db.events,eventId)
-    # crud.settings.update_next = URL('myEvents')
-    record = db.events(eventId)
+    record = db.events(event_id)
     form = SQLFORM(db.events, record)
     if form.process().accepted:
         redirect(URL('myEvents'))
