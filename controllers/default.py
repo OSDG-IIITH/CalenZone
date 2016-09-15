@@ -167,8 +167,9 @@ def createEvent():
 
     # Processing Form
     # Auto setting end date
+
     if request.post_vars.startAt:
-        if request.post_vars.endAt == "":
+        if request.post_vars.endAt == "" or (not request.post_vars.endCheck):
             try:
                 #form.vars.endAt = datetime.datetime.strptime(request.vars.startAt,'%Y-%m-%d %H:%M:%S') + datetime.timedelta(0, 3600)
                 request.post_vars.endAt = str(datetime.datetime.strptime(request.vars.startAt, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(0, 3600))
@@ -177,9 +178,10 @@ def createEvent():
                 form.errors = True
         else:
             try:
-                datetime.datetime.strptime(request.vars.startAt, '%Y-%m-%d %H:%M:%S') > datetime.datetime.strptime(request.vars.endAt, '%Y-%m-%d %H:%M:%S')
-                form.errors = True
-                response.flash += "End before start!"
+                if datetime.datetime.strptime(request.vars.startAt, '%Y-%m-%d %H:%M:%S') > datetime.datetime.strptime(request.vars.endAt, '%Y-%m-%d %H:%M:%S'):
+                    form.errors = True
+                    response.flash += "End before start!"
+
             except:
                 response.flash += "Invalid Date Format: End At"
                 form.errors = True
@@ -212,6 +214,7 @@ def createEvent():
                 response.flash += ":" + str(gr_id)
                 db.eventTag.insert(tag=gr_id, events=form.vars.id)
             redirect(URL('calendar'))
+
     return dict(form=form, grouplist=T(y))
 
 
