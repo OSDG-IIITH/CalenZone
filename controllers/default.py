@@ -21,6 +21,17 @@ def index():
     redirect(URL('calendar'))
     return None # Should never reach here because of redirect
 
+def group():
+    #request.args[0] is the group name.
+
+    tag_list = []
+    query1 = db.eventTag.events == db.events.id
+    query2 = db.tag.id == db.eventTag.tag
+    query3 = db.tag.tagName == request.args[0]
+    query4 = db.events.created_by == session.auth.user.id
+    events = db(query1 & query2 & query3 & query4).select()
+
+    return dict(res = events, arg=request.args[0])
 
 @auth.requires_login()
 def search():
@@ -33,7 +44,7 @@ def search():
             item.selfEvent = "Yes"
         else:
             item.selfEvent = "No"
-        
+
     return dict(res=res)
 
 
