@@ -28,6 +28,12 @@ def search():
     query &= (db.userTag.auth_user == session.auth.user.id) # Check if logged in user is subscribed to some tag
     query &= (db.events.id == db.eventTag.events) # Join eventTag and events
     res = db(query).select(db.events.ALL)
+    for item in res:
+        if item.created_by == session.auth.user.id:
+            item.selfEvent = "Yes"
+        else:
+            item.selfEvent = "No"
+        
     return dict(res=res)
 
 
