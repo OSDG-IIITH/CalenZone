@@ -14,7 +14,7 @@
     <td>{{=item.startAt.strftime("%H:%M %B %d, %Y")}}</td>
     <td>{{=item.endAt.strftime("%H:%M %B %d, %Y")}}</td>
     <td>{{=item.typeOfEvent}} </td>
-    <td>{{=tagarr[idx]}}
+    <td>{{=tag_list[idx]}}
     <a role="button" class="btn btn-xs btn-primary" style = "float: right;" href='{{=URL("changeTags", args=[item.id])}}'>
          <span class="  glyphicon glyphicon-pencil"></span>&nbsp;</a>
          </td>
