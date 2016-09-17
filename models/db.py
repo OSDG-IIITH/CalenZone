@@ -82,6 +82,7 @@ auth.settings.reset_password_requires_verification = True
 
 db.define_table('tag',
                Field('tagName', 'string', unique=True),
+               Field('isModerated', 'boolean', default = False),
                format='%(tagName)s')
 
 db.define_table('events',
@@ -92,6 +93,7 @@ db.define_table('events',
                 Field('contact', 'string', label="Contact"),
                 Field('description', 'text', label="Description (*)", requires=IS_NOT_EMPTY()),
                 Field('link', 'string', label="Webpage link"),
+    
                 Field('typeOfEvent', 'string', label="Event Tag (*)", requires = IS_IN_SET(['Academic', 'Cultural', 'Sports', 'Holiday', 'Other', 'Urgent'])),
                 auth.signature,
                 format='%(eventName)s')
@@ -100,8 +102,13 @@ db.define_table('userTag',
                 Field('auth_user', db.auth_user, readable=False, writable=False),
                 Field('tag', db.tag))
 
+db.define_table('Moderators',
+                Field('auth_user', db.auth_user, readable=False, writable=False),
+                Field('tag', db.tag))
+
 db.define_table('eventTag',
                 Field('tag', db.tag),
+                Field('isApproved', 'integer', readable=False, writable=False, default=0),
                 Field('events', db.events))
 ## Fields can be 'string','text','password','integer','double','boolean'
 ##       'date','time','datetime','blob','upload', 'reference TABLENAME'

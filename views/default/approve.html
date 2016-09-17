@@ -1,0 +1,21 @@
+{{extend 'layout.html'}}
+<h2>Moderation</h2>
+<table class="table table-striped" border="1">
+    <thead><tr><th>Events</th></tr></thead>
+    <tbody>
+{{for item in events:}}
+<tr>
+    <td>
+        {{=item.events.eventName}}
+        <a role="button" class="btn btn-xs btn-primary" style = "float: right;" href='{{=URL("editEvent", args=[item.id])}}'>
+         <span class="glyphicon glyphicon-ok"></span>&nbsp;
+        </a>
+        <a role="button" class="btn btn-xs btn-primary" style = "float: right;" href='{{=URL("editEvent", args=[item.id])}}'>
+         <span class="glyphicon glyphicon-remove"></span>&nbsp;
+        </a>
+    </td>
+</tr>
+{{pass}}
+        </tbody>
+</table>
+

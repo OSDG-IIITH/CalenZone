@@ -28,7 +28,9 @@ response.menu = [
     (T('Create Event'), False, URL('default', 'createEvent'), []),
     (T('My Groups'), False, URL('default', 'profile'), []),
     (T('Search'), False, URL('default', 'search'), []),
-    (T('Import'), False, URL('default', 'importEvents'), [])
+    (T('Import'), False, URL('default', 'importEvents'), []),
+    (T('Approve'), False, URL('default', 'approve'), [])
+
 ]
 
 DEVELOPMENT_MENU = False

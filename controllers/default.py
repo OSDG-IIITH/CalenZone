@@ -176,6 +176,7 @@ def groupNameFormatter(list_of_tags):
 @auth.requires_login()
 def createEvent():
     form = SQLFORM(db.events)
+    form.vars.startAt = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     form.vars.created_by = session.auth.user.id
 
     # Adding group names
@@ -217,10 +218,11 @@ def createEvent():
             if len(db(db.tag.tagName == group).select(db.tag.id)) == 0:
                 response.flash += "Invalid Group Name!"
                 form.errors = True
-        # testcase2
-        if len(groups) != len(set(groups)):
-            response.flash += "Multiple groups of same name!"
-            form.errors = True
+        if not form.errors:
+            # testcase2
+            if len(groups) != len(set(groups)):
+                response.flash += "Multiple groups of same name!"
+                form.errors = True
 
     if not form.errors:
         if form.process().accepted:
@@ -228,19 +230,25 @@ def createEvent():
             groups = request.vars.groups.split(", ")
             for group in groups:
                 gr_id = db(db.tag.tagName == group).select(db.tag.id)[0].id
-                response.flash += ":" + str(gr_id)
-                db.eventTag.insert(tag=gr_id, events=form.vars.id)
+                isModerated = db(db.tag.tagName == group).select(db.tag.isModerated) 
+                #isModerated -> True, if moderated, False if not.              
+                db.eventTag.insert(tag=gr_id, events=form.vars.id, isApproved = 0 if isModerated else 1)
             redirect(URL('calendar'))
 
     return dict(form=form, grouplist=T(y))
 
+@auth.requires_login()
+def approveEvent():
+    moderatorOf = db(db.Moderators.auth_user==session.auth.user).select(db.Moderators.tag)
+    eventsToModerate = db(db.eventTag.tag in moderatorOf and db.eventTag.isApproved == 0).select()
+    return {'events': eventsToModerate}
 
 @auth.requires_login()
 def changeTags():
     try:
         request.args[0]
     except IndexError:
-        session.flash = "Non existant event"
+        session.flash = "Non existent event"
         redirect(URL('myEvents'))
     form_id = request.args[0]
 
