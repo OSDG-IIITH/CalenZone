@@ -240,7 +240,7 @@ def createEvent():
 @auth.requires_login()
 def approveEvent():
     moderatorOf = db(db.Moderators.auth_user==session.auth.user).select(db.Moderators.tag)
-    eventsToModerate = db(db.eventTag.tag in moderatorOf and db.eventTag.isApproved == 0).select()
+    eventsToModerate = db((db.eventTag.tag in moderatorOf) & (db.eventTag.isApproved == 0)).select()
     return {'events': eventsToModerate}
 
 @auth.requires_login()
@@ -331,11 +331,6 @@ def editEvent():
     if form.process().accepted:
         redirect(URL('myEvents'))
     return dict(form=form)
-
-
-def gen_mail():
-    response.view = 'default/index.html'
-    return locals()
 
 
 def calendar():

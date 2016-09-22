@@ -28,10 +28,13 @@ response.menu = [
     (T('Create Event'), False, URL('default', 'createEvent'), []),
     (T('My Groups'), False, URL('default', 'profile'), []),
     (T('Search'), False, URL('default', 'search'), []),
-    (T('Import'), False, URL('default', 'importEvents'), []),
-    (T('Approve'), False, URL('default', 'approve'), [])
-
 ]
+
+if session.auth != None:
+    response.menu += [
+    (T('Import'), False, URL('default', 'importEvents'), []),
+    (T('Approve'), False, URL('default', 'approveEvent'), []),
+    ]
 
 DEVELOPMENT_MENU = False
 
