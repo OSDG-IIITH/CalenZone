@@ -230,8 +230,8 @@ def createEvent():
             groups = request.vars.groups.split(", ")
             for group in groups:
                 gr_id = db(db.tag.tagName == group).select(db.tag.id)[0].id
-                isModerated = db(db.tag.tagName == group).select(db.tag.isModerated) 
-                #isModerated -> True, if moderated, False if not.              
+                isModerated = db(db.tag.tagName == group).select(db.tag.isModerated)
+                #isModerated -> True, if moderated, False if not.
                 db.eventTag.insert(tag=gr_id, events=form.vars.id, isApproved = 0 if isModerated else 1)
             redirect(URL('calendar'))
 
@@ -240,7 +240,10 @@ def createEvent():
 @auth.requires_login()
 def approveEvent():
     moderatorOf = db(db.Moderators.auth_user==session.auth.user).select(db.Moderators.tag)
-    eventsToModerate = db(db.eventTag.tag in moderatorOf and db.eventTag.isApproved == 0).select()
+    if(len(moderatorOf)>0):
+         eventsToModerate = db(db.eventTag.tag in moderatorOf and db.eventTag.isApproved == 0).select()
+    else:
+        eventsToModerate = []
     return {'events': eventsToModerate}
 
 @auth.requires_login()
