@@ -244,10 +244,13 @@ def approveEvent():
          eventsToModerate = db(db.eventTag.tag in moderatorOf and db.eventTag.isApproved == 0).select()
     else:
         eventsToModerate = []
-    '''if len(request.args) > 0:
+    if len(request.args) > 0:
         for item in eventsToModerate:
-            if item.event_id == request.args[0] and item.tag == :
-                db.select(db.eventTag.events == )'''
+            print item, request.args
+            if item.id == int(request.args[0]) and item.tag == int(request.args[1]):
+                print "Hehe"
+                setApproveOf = db.select(db.eventTag.events == item.id and db.eventTag.tag == item.tag)[0]
+                setApproveOf.update(isApproved = int(request.args[2]))
     return {'events': eventsToModerate, 'args': request.args}
 
 @auth.requires_login()
