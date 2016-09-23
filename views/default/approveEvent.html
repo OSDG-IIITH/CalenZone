@@ -1,5 +1,4 @@
 {{extend 'layout.html'}}
-{{=args}}
 <h2>Moderation</h2>
 <table class="table table-striped" border="1">
     <thead><tr><th>Event</th><th>Group</th></tr></thead>
@@ -11,10 +10,10 @@
       </td>
       <td>
         {{=item.tag}}
-        <a role="button" class="btn btn-xs btn-primary" style = "float: right;" href='{{=URL("approveEvent", args=[item.id, item.tag, 1])}}'>
+        <a role="button" class="btn btn-xs btn-primary" style = "float: right;"  href='{{=URL("approveEvent", args=[item.id, item.tag, 1])}}'>
          <span class="glyphicon glyphicon-ok"></span>&nbsp;
         </a>
-        <a role="button" class="btn btn-xs btn-primary" style = "float: right;" href='{{=URL("approveEvent", args=[item.id, item.tag, 0])}}'>
+        <a role="button" class="btn btn-xs btn-primary" style = "float: right;" onclick="return confirm('Are you sure you want to reject this event?')" href='{{=URL("approveEvent", args=[item.id, item.tag, -1])}}'>
          <span class="glyphicon glyphicon-remove"></span>&nbsp;
         </a>
     </td>
