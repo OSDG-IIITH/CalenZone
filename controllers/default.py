@@ -336,11 +336,6 @@ def editEvent():
     return dict(form=form)
 
 
-def gen_mail():
-    response.view = 'default/index.html'
-    return locals()
-
-
 def calendar():
     if session.auth != None:
         useremail = db(db.auth_user.id==session.auth.user.id).select(db.auth_user.email)[0].email
