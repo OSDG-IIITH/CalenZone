@@ -32,83 +32,80 @@
     }
 </style>
 
-
-
-<div class="container">
-    <div class="page-header">
-        <div class="row">
-            <div class="col-sm-3">
-                <h3 class="calendar-title">
-
-                </h3>
-            </div>
-            <div class="col-sm-6">
-
-                <div class="btn-group">
-                    <button class="btn btn-primary" data-calendar-nav="prev"><< Prev</button>
-                    <button class="btn" data-calendar-nav="today">Today</button>
-                    <button class="btn btn-primary" data-calendar-nav="next">Next >></button>
-                </div>
-                <div class="btn-group">
-                    <button class="btn btn-warning" data-calendar-view="year">Year</button>
-                    <button class="btn btn-warning active" data-calendar-view="month">Month</button>
-                    <button class="btn btn-warning" data-calendar-view="week">Week</button>
-                    <button class="btn btn-warning" data-calendar-view="day">Day</button>
-                </div>
-            </div>
-            <div class="col-sm-3">
-                <table class="table borderless">
-                    <tr>
-                        <td><div class="event event-important"/></td>
-                        <td>Urgent</td>
-                        <td><div class="event event-info"/></td>
-                        <td>Academic</td>
-                    </tr>
-                    <tr>
-                        <td><div class="event event-warning"/></td>
-                        <td>Holiday</td>
-                        <td><div class="event event-inverse"/></td>
-                        <td>Other</td>
-                    </tr>
-                    <tr>
-                        <td><div class="event event-success"/></td>
-                        <td>Cultural</td>
-                        <td><div class="event event-special"/></td>
-                        <td>Sports</td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-    </div>
+<div class="page-header">
     <div class="row">
-        <div class="col-sm-9">
-            <div id="calendar"></div>
+        <div class="col-sm-3">
+            <h3 class="calendar-title">
+
+            </h3>
         </div>
-        <div class="col-sm-3" style="max-height:100%;height:auto;overflow:auto">
-            {{if useremail=="Not Logged in":}}
-            <h3>
-                Please log in to see your events
-            </h3>
-            {{else:}}
-            <h3>
-                iCal Address
-            </h3>
-            <input id="foo" value="{{=URL('iCal',args=[useremail], host=True)}}">
-            <button class="btn" data-clipboard-target="#foo">
-                <img src="{{=URL('static','bower_components/clipboard/clippy.svg')}}" alt="Copy to clipboard">
-            </button>
-            {{pass}}
-            <div class="well row" id="events">
-                <h3>
-                    Events
-                </h3>
-                <input class="search" placeholder="Search"/>
-                <ul id="eventlist" class="list nav nav-list" style="max-height: 60vh;height:auto;overflow:auto">
-                </ul>
+        <div class="col-sm-6">
+
+            <div class="btn-group">
+                <button class="btn btn-primary" data-calendar-nav="prev"><< Prev</button>
+                <button class="btn" data-calendar-nav="today">Today</button>
+                <button class="btn btn-primary" data-calendar-nav="next">Next >></button>
             </div>
+            <div class="btn-group">
+                <button class="btn btn-warning" data-calendar-view="year">Year</button>
+                <button class="btn btn-warning active" data-calendar-view="month">Month</button>
+                <button class="btn btn-warning" data-calendar-view="week">Week</button>
+                <button class="btn btn-warning" data-calendar-view="day">Day</button>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <table class="table borderless">
+                <tr>
+                    <td><div class="event event-important"/></td>
+                    <td>Urgent</td>
+                    <td><div class="event event-info"/></td>
+                    <td>Academic</td>
+                </tr>
+                <tr>
+                    <td><div class="event event-warning"/></td>
+                    <td>Holiday</td>
+                    <td><div class="event event-inverse"/></td>
+                    <td>Other</td>
+                </tr>
+                <tr>
+                    <td><div class="event event-success"/></td>
+                    <td>Cultural</td>
+                    <td><div class="event event-special"/></td>
+                    <td>Sports</td>
+                </tr>
+            </table>
         </div>
     </div>
 </div>
+<div class="row">
+    <div class="col-sm-9">
+        <div id="calendar"></div>
+    </div>
+    <div class="col-sm-3" style="max-height:100%;height:auto;overflow:auto">
+        {{if useremail=="Not Logged in":}}
+        <h3>
+            Please log in to see your events
+        </h3>
+        {{else:}}
+        <h3>
+            iCal Address
+        </h3>
+        <input id="foo" value="{{=URL('iCal',args=[useremail], host=True)}}">
+        <button class="btn" data-clipboard-target="#foo">
+            <img src="{{=URL('static','bower_components/clipboard/clippy.svg')}}" alt="Copy to clipboard">
+        </button>
+        {{pass}}
+        <div class="well row" id="events">
+            <h3>
+                Events
+            </h3>
+            <input class="search" placeholder="Search"/>
+            <ul id="eventlist" class="list nav nav-list" style="max-height: 60vh;height:auto;overflow:auto">
+            </ul>
+        </div>
+    </div>
+</div>
+
 
 <div class="modal fade" id="events-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
