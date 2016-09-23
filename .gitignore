@@ -54,4 +54,6 @@ Temporary Items
 
 *.pyc
 
+*.1
+
 *.bak
