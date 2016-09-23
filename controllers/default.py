@@ -110,7 +110,7 @@ def profile():
 @auth.requires_login()
 def importEvents():
     all_tags = db(db.tag.id>0).select() # Gets all rows in the table tag
-    group_dict = {a.tagName:a.id for i in all_tags}
+    group_dict = {a.tagName:a.id for a in all_tags}
 
     if request.vars.csvfile != None:
         csvdata = csv.reader(request.vars.csvfile.file)
@@ -367,18 +367,18 @@ def deleteEvent():
 
 
 def eventView():
+    q3 = db.events.id == db.eventTag.events
+    q4 = db.eventTag.isApproved == False
     if session.auth != None:
         q1 = db.userTag.tag == db.eventTag.tag
         q2 = db.userTag.auth_user == session.auth.user.id
-        q3 = db.events.id == db.eventTag.events
-        events = db((q1 & q2 & q3)).select(db.events.eventName, db.events.id, db.events.startAt,
+        events = db((q1 & q2 & q3 & q4)).select(db.events.eventName, db.events.id, db.events.startAt,
                                        db.events.endAt, db.events.typeOfEvent,
                                        distinct=True)
     else:
         q1 = db.eventTag.tag == db.tag.id
         q2 = db.tag.tagName == "Public"
-        q3 = db.events.id == db.eventTag.events
-        events = db((q1 & q2 & q3)).select(db.events.eventName, db.events.id, db.events.startAt,
+        events = db((q1 & q2 & q3 & q4)).select(db.events.eventName, db.events.id, db.events.startAt,
                                        db.events.endAt, db.events.typeOfEvent,
                                        distinct=True)
 
