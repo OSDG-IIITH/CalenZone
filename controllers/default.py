@@ -12,7 +12,6 @@ import csv
 
 UNREMOVABLE_GROUPS = ["All", "Students", "Research", "Faculty"]
 
-
 def index():
     """
     Dummy to redirect to home page
@@ -21,8 +20,13 @@ def index():
     redirect(URL('calendar'))
     return None # Should never reach here because of redirect
 
+
 def group():
     #request.args[0] is the group name.
+
+    if len(request.args) == 0:
+        session.flash = "No such event"
+        redirect(URL('calendar'))
 
     tag_list = []
     query1 = db.eventTag.events == db.events.id
@@ -31,7 +35,8 @@ def group():
     query4 = db.events.created_by == session.auth.user.id
     events = db(query1 & query2 & query3 & query4).select()
 
-    return dict(res = events, arg=request.args[0])
+    return dict(res = events, group=db.tag[request.args[0]])
+
 
 @auth.requires_login()
 def search():
@@ -183,7 +188,7 @@ def createEvent():
     x = db(db.tag).select(db.tag.tagName)
     y = groupNameFormatter(x)
 
-    # Processing Form
+    # Processing form
     # Auto setting end date
 
     if request.post_vars.startAt:
@@ -199,7 +204,6 @@ def createEvent():
                 if datetime.datetime.strptime(request.vars.startAt, '%Y-%m-%d %H:%M:%S') > datetime.datetime.strptime(request.vars.endAt, '%Y-%m-%d %H:%M:%S'):
                     form.errors = True
                     response.flash += "End before start!"
-
             except:
                 response.flash += "Invalid Date Format: End At"
                 form.errors = True
@@ -237,6 +241,7 @@ def createEvent():
 
     return dict(form=form, grouplist=T(y))
 
+
 @auth.requires_login()
 def approveEvent():
     moderatorOf = db(db.Moderators.auth_user==session.auth.user).select(db.Moderators.tag)
@@ -246,12 +251,15 @@ def approveEvent():
         eventsToModerate = []
     if len(request.args) > 0:
         for item in eventsToModerate:
-            print item, request.args
             if item.id == int(request.args[0]) and item.tag == int(request.args[1]):
-                print "Hehe"
-                setApproveOf = db.select(db.eventTag.events == item.id and db.eventTag.tag == item.tag)[0]
-                setApproveOf.update(isApproved = int(request.args[2]))
+                setApproveOf = db(db.eventTag.events == item.id and db.eventTag.tag == item.tag).select().first()
+                setApproveOf.update_record(isApproved = int(request.args[2]))
+        if(len(moderatorOf)>0):
+             eventsToModerate = db(db.eventTag.tag in moderatorOf and db.eventTag.isApproved == 0).select()
+        else:
+            eventsToModerate = []
     return {'events': eventsToModerate, 'args': request.args}
+
 
 @auth.requires_login()
 def changeTags():
@@ -344,7 +352,7 @@ def editEvent():
 
 
 def calendar():
-    if session.auth != None:
+    if session.auth is not None:
         useremail = db(db.auth_user.id==session.auth.user.id).select(db.auth_user.email)[0].email
         check = db((db.userTag.auth_user == session.auth.user.id) & (db.userTag.tag == db.tag.id) & (db.tag.tagName == "All")).count() # Code to add the All tag to every user that logs in
         if check == 0:
@@ -388,7 +396,6 @@ def eventView():
         events = db((q1 & q2 & q3 & q4)).select(db.events.eventName, db.events.id, db.events.startAt,
                                        db.events.endAt, db.events.typeOfEvent,
                                        distinct=True)
-
     json_response = []
     for event in events:
         temp = {}
