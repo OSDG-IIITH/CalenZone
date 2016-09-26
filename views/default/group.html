@@ -1,7 +1,7 @@
 {{extend 'layout.html'}}
 <script src="{{=URL('static','DataTables/datatables.min.js')}}"></script>
 <link rel="stylesheet" href="{{=URL('static','DataTables/datatables.min.css')}}">
-<h1>{{=arg}} group Events</h1>
+<h1>Events for group '{{=group.tagName}}'</h1>
 <table id="datatable" border="1">
     <thead><tr><th>id</th><th>Name</th><th>Begins</th><th>Ends</th><th>Venue</th><th>Contact</th><th>Description</th><th>Link</th><th>Type</th></tr></thead>
 {{for item in res:}}
