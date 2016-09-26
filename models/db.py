@@ -132,6 +132,10 @@ db.define_table('events',
                 auth.signature,
                 format='%(eventName)s')
 
+db.define_table('Venue',Field('name'))
+db.events.venue.widget = SQLFORM.widgets.autocomplete(
+     request, db.Venue.name, limitby=(0,10), min_length=2)
+
 db.define_table('userTag',
                 Field('auth_user', db.auth_user, readable=False, writable=False),
                 Field('tag', db.tag))

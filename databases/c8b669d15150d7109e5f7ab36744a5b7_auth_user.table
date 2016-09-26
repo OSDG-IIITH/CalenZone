@@ -70,11 +70,7 @@ sg9
 I00
 sg10
 g11
-<<<<<<< HEAD
-ssS'id'
-=======
 ssS'email'
->>>>>>> origin/master
 p21
 (dp22
 g4
@@ -82,31 +78,17 @@ I512
 sg5
 I00
 sg6
-<<<<<<< HEAD
-I1
-sg7
-S'INTEGER PRIMARY KEY AUTOINCREMENT'
-=======
 I4
 sg7
 S'CHAR(512)'
->>>>>>> origin/master
 p23
 sg9
 I00
 sg10
-<<<<<<< HEAD
-S'id'
-p24
-ssS'reset_password_key'
-p25
-(dp26
-=======
 g11
 ssS'reset_password_key'
 p24
 (dp25
->>>>>>> origin/master
 g4
 I512
 sg5
@@ -115,23 +97,14 @@ sg6
 I8
 sg7
 S'CHAR(512)'
-<<<<<<< HEAD
-p27
-=======
 p26
->>>>>>> origin/master
 sg9
 I00
 sg10
 g11
 ssS'password'
-<<<<<<< HEAD
-p28
-(dp29
-=======
 p27
 (dp28
->>>>>>> origin/master
 g4
 I512
 sg5
@@ -140,17 +113,6 @@ sg6
 I6
 sg7
 S'CHAR(512)'
-<<<<<<< HEAD
-p30
-sg9
-I00
-sg10
-S'password'
-p31
-ssS'registration_key'
-p32
-(dp33
-=======
 p29
 sg9
 I00
@@ -159,7 +121,6 @@ g27
 ssS'registration_key'
 p30
 (dp31
->>>>>>> origin/master
 g4
 I512
 sg5
@@ -168,39 +129,19 @@ sg6
 I7
 sg7
 S'CHAR(512)'
-<<<<<<< HEAD
-p34
-=======
 p32
->>>>>>> origin/master
 sg9
 I00
 sg10
 g11
-<<<<<<< HEAD
-ssS'email'
-p35
-(dp36
-=======
 ssS'id'
 p33
 (dp34
->>>>>>> origin/master
 g4
 I512
 sg5
 I00
 sg6
-<<<<<<< HEAD
-I4
-sg7
-S'CHAR(512)'
-p37
-sg9
-I00
-sg10
-g11
-=======
 I1
 sg7
 S'INTEGER PRIMARY KEY AUTOINCREMENT'
@@ -209,5 +150,4 @@ sg9
 I00
 sg10
 g33
->>>>>>> origin/master
 ss.
