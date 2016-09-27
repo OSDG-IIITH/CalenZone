@@ -1,5 +1,7 @@
 {{extend 'layout.html'}}
 <h2>Moderation</h2>
+<hr>
+{{if len(events)>0:}}
 <table class="table table-striped" border="1">
     <thead><tr><th>Event</th><th>Group</th></tr></thead>
     <tbody>
@@ -21,3 +23,6 @@
 {{pass}}
         </tbody>
 </table>
+{{else:}}
+<h2>There are no events to approve.</h2>
+{{pass}}
