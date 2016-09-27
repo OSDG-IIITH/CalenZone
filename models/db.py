@@ -63,8 +63,8 @@ response.form_label_separator = myconf.get('forms.separator') or ''
 # -------------------------------------------------------------------------
 # (optional) optimize handling of static files
 # -------------------------------------------------------------------------
-# response.optimize_css = 'concat,minify,inline'
-# response.optimize_js = 'concat,minify,inline'
+response.optimize_css = 'concat,minify,inline'
+response.optimize_js = 'concat,minify,inline'
 
 # -------------------------------------------------------------------------
 # (optional) static assets folder versioning
