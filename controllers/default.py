@@ -9,6 +9,7 @@
 import time
 import datetime
 import csv
+import ldap
 
 UNREMOVABLE_GROUPS = ["All", "Students", "Research", "Faculty"]
 
@@ -356,9 +357,23 @@ def calendar():
         useremail = db(db.auth_user.id==session.auth.user.id).select(db.auth_user.email)[0].email
         check = db((db.userTag.auth_user == session.auth.user.id) & (db.userTag.tag == db.tag.id) & (db.tag.tagName == "All")).count() # Code to add the All tag to every user that logs in
         if check == 0:
+            session.flash = "Looks like you are new here! Subscribe to your groups here!"
             db.userTag.insert(auth_user=session.auth.user.id, tag=1)
+
+            l=ldap.initialize("ldap://ldap.iiit.ac.in",636)
+            baseDN = "ou=Users, dc=iiit, dc=ac, dc=in"
+            searchScope = ldap.SCOPE_SUBTREE
+            ## retrieve all attributes - again adjust to your needs - see documentation for more options
+            retrieveAttributes = None 
+            searchFilter = "mail=*%s*" %(session.auth.user.email)
+            ldap_result_id = l.search(baseDN, searchScope, searchFilter, retrieveAttributes)
+            result_data = l.result(ldap_result_id, 0)
+
+            redirect(URL("profile"))
     else:
         useremail = "Not Logged in"
+    
+
     return locals()
 
 
