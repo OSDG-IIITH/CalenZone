@@ -121,7 +121,7 @@ db.define_table('tag',
 
 db.define_table('events',
                 Field('eventName', 'string', label="Event's Name (*)", requires=IS_NOT_EMPTY()),
-                Field('startAt', 'datetime', label="Starts At (*)", requires=[IS_NOT_EMPTY(),IS_DATETIME_IN_RANGE(format=T('%Y-%m-%d %H:%M:%S'),minimum=datetime.datetime.today(),error_message='Wrong Date')]),
+                Field('startAt', 'datetime', label="Starts At (*)", requires=[IS_NOT_EMPTY(),IS_DATETIME_IN_RANGE(format=T('%Y-%m-%d %H:%M:%S'),error_message='Wrong Date')]),
                 Field('endAt', 'datetime', label="Ends At"),
                 Field('venue', 'string', label="Venue"),
                 Field('contact', 'string', label="Contact"),
