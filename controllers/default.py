@@ -389,7 +389,8 @@ def eventView():
     if session.auth != None:
         q1 = db.userTag.tag == db.eventTag.tag
         q2 = db.userTag.auth_user == session.auth.user.id
-        events = db((q1 & q2 & q3 & q4)).select(db.events.eventName, db.events.id, db.events.startAt,
+        qSelf_event = db.events.created_by == session.auth.user
+        events = db((q1 & q2 & q3 & q4 | qSelf_event)).select(db.events.eventName, db.events.id, db.events.startAt,
                                        db.events.endAt, db.events.typeOfEvent,
                                        distinct=True)
     else:
