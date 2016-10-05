@@ -6,7 +6,7 @@
 # ----------------------------------------------------------------------------------------------------------------------
 
 response.logo = A(B('IIIT Events Portal'),
-                  _class="navbar-brand", _href="http://www.web2py.com/",
+                  _class="navbar-brand", _href=URL("default", "calendar"),
                   _id="web2py-logo")
 response.title = request.application.replace('_', ' ').title()
 response.subtitle = ''

@@ -11,7 +11,7 @@ import datetime
 import csv
 import ldap
 
-UNREMOVABLE_GROUPS = ["All", "Students", "Research", "Faculty"]
+UNREMOVABLE_GROUPS = ["All"]
 
 def index():
     """
@@ -154,7 +154,6 @@ def deleteGroup():
     try:
         group = request.args[0]
     except IndexError:
-        session.flash = "Incorrect Url: No parameters"
         redirect(URL('profile'))
     if group in UNREMOVABLE_GROUPS:
         session.flash = "You cannot remove yourself from this group!"
